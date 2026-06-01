@@ -38,6 +38,18 @@
         </label>
 
         <label class="row">
+          <span>Line merging</span>
+          <input type="range" id="mergeAngle" min="0" max="160" step="5" value="75" />
+          <output id="mergeAngleVal">75&deg;</output>
+        </label>
+
+        <label class="row">
+          <span>Prune spurs</span>
+          <input type="range" id="spurLength" min="0" max="30" step="1" value="6" />
+          <output id="spurLengthVal">6</output>
+        </label>
+
+        <label class="row">
           <span>Smoothing</span>
           <input type="range" id="smoothing" min="0" max="1" step="0.05" value="1" />
           <output id="smoothingVal">1.00</output>

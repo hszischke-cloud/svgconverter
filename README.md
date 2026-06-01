@@ -34,12 +34,18 @@ The tracing engine (`app/tracing/`) runs this pipeline:
 4. **Graph trace** — skeleton pixels are classified by neighbour count into
    endpoints / junctions / path pixels, then walked into ordered polylines
    (`skeleton.py`). Closed loops with no endpoints are handled explicitly.
-5. **Simplify** — Ramer–Douglas–Peucker drops redundant points (`bezier.py`).
-6. **Smooth** — polylines become smooth cubic Bézier curves via a Catmull-Rom
+5. **Stroke linking** — junction pixels are clustered, dead-end spurs pruned,
+   and edges meeting at a junction are paired by **tangent continuity**: the
+   two whose directions are most collinear are merged into one stroke that
+   *bends* through the junction. This keeps a line that crosses or touches
+   other lines as a single vector instead of fragmenting into many pieces, so
+   the output uses far fewer paths.
+6. **Simplify** — Ramer–Douglas–Peucker drops redundant points (`bezier.py`).
+7. **Smooth** — polylines become smooth cubic Bézier curves via a Catmull-Rom
    spline conversion.
-7. **Stroke width** — estimated from the distance transform of the mask so the
+8. **Stroke width** — estimated from the distance transform of the mask so the
    SVG stroke roughly matches the original line weight.
-8. **Emit** — each path is written as `<path fill="none" stroke=... />`
+9. **Emit** — each path is written as `<path fill="none" stroke=... />`
    (`svg.py`).
 
 ## Running it
@@ -58,6 +64,8 @@ the result side-by-side, and download the SVG.
 |---------------|---------------------------------------------------------------------|
 | Threshold     | Ink/paper cutoff (0–255), or **auto** (Otsu).                       |
 | Invert        | For light lines on a dark background.                               |
+| Line merging  | Max bend angle (deg) to keep a line continuing through a junction. Higher = fewer, more-bending vectors. |
+| Prune spurs   | Remove dead-end barbs (skeleton noise) shorter than this many px.   |
 | Smoothing     | Curve tension: 0 = straight segments, 1 = smooth spline.            |
 | Simplify      | RDP tolerance in pixels — higher = fewer, looser points.            |
 | Despeckle     | Minimum connected-component size to keep (removes specks).          |

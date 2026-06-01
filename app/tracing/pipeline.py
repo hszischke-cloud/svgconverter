@@ -17,7 +17,7 @@ from skimage.filters import threshold_otsu
 from skimage.morphology import skeletonize
 
 from .bezier import catmull_rom_to_bezier, rdp
-from .skeleton import skeleton_to_polylines
+from .skeleton import skeleton_to_strokes
 from .svg import build_svg
 
 
@@ -28,6 +28,8 @@ class TraceParams:
     threshold: Optional[int] = None      # 0-255, or None for automatic (Otsu)
     invert: bool = False                 # treat light lines on dark background
     min_object_size: int = 12            # remove speckles smaller than this (px)
+    merge_angle: float = 75.0            # max bend (deg) to link a line through a junction
+    spur_length: int = 6                 # prune dead-end barbs shorter than this (px)
     simplify: float = 1.5                # RDP tolerance in pixels
     smoothing: float = 1.0               # Catmull-Rom tension (0=straight, 1=smooth)
     min_path_length: int = 5             # drop polylines shorter than this (px)
@@ -108,7 +110,11 @@ def trace(image: Image.Image, params: TraceParams | None = None) -> TraceResult:
     mask = _despeckle(mask, params.min_object_size)
 
     skel = skeletonize(mask)
-    polylines = skeleton_to_polylines(skel)
+    polylines = skeleton_to_strokes(
+        skel,
+        max_bend=params.merge_angle,
+        spur_length=params.spur_length,
+    )
 
     stroke_w = (
         params.stroke_width

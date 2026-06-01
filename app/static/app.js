@@ -15,6 +15,8 @@ const statusEl = $("status");
 
 // --- Slider value labels -------------------------------------------------
 const sliders = [
+  ["mergeAngle", "mergeAngleVal", (v) => `${v}°`],
+  ["spurLength", "spurLengthVal", (v) => v],
   ["smoothing", "smoothingVal", (v) => Number(v).toFixed(2)],
   ["simplify", "simplifyVal", (v) => Number(v).toFixed(2)],
   ["minObjectSize", "minObjectSizeVal", (v) => v],
@@ -90,6 +92,8 @@ async function convert() {
   );
   fd.append("invert", $("invert").checked);
   fd.append("min_object_size", $("minObjectSize").value);
+  fd.append("merge_angle", $("mergeAngle").value);
+  fd.append("spur_length", $("spurLength").value);
   fd.append("simplify", $("simplify").value);
   fd.append("smoothing", $("smoothing").value);
   fd.append(
