@@ -30,6 +30,34 @@ header h1 {
 
 .tagline { color: var(--muted); margin: 0.4rem 0 0; }
 
+.tabs {
+  display: inline-flex;
+  gap: 0.4rem;
+  margin-top: 1.2rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.3rem;
+}
+
+.tab {
+  width: auto;
+  margin: 0;
+  padding: 0.5rem 1.1rem;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.tab:not(:disabled):hover { background: #f0f4ee; color: var(--ink); }
+.tab.active { background: var(--accent); color: #fff; }
+.tab.active:hover { background: var(--accent); }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: grid; }
+
 main {
   display: grid;
   grid-template-columns: 340px 1fr;
@@ -110,6 +138,26 @@ button:not(:disabled):hover { background: var(--ink); }
 #downloadBtn:not(:disabled):hover { background: #2b2b27; }
 
 .status { color: var(--muted); font-size: 0.85rem; min-height: 1.2em; margin: 0.6rem 0 0; }
+
+.panel-intro { font-size: 0.88rem; color: var(--muted); margin: 0 0 1rem; }
+
+.stats {
+  margin: 1rem 0 0;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #f7faf5;
+  font-size: 0.88rem;
+}
+
+.stats div {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.15rem 0;
+}
+
+.stats dt { color: var(--muted); margin: 0; }
+.stats dd { margin: 0; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 
 .preview {
   display: grid;
