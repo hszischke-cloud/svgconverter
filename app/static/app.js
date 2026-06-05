@@ -48,7 +48,10 @@ $("autoStroke").addEventListener("change", (e) => {
 });
 
 // --- File selection ------------------------------------------------------
-dropzone.addEventListener("click", () => fileInput.click());
+dropzone.addEventListener("click", (e) => {
+  if (e.target === fileInput) return; // avoid re-triggering from the bubbled click
+  fileInput.click();
+});
 fileInput.addEventListener("change", () => {
   if (fileInput.files.length) loadFile(fileInput.files[0]);
 });
@@ -168,7 +171,10 @@ const plotterDownloadBtn = $("plotterDownloadBtn");
 const plotterStatusEl = $("plotterStatus");
 const travelStats = $("travelStats");
 
-plotterDropzone.addEventListener("click", () => plotterFileInput.click());
+plotterDropzone.addEventListener("click", (e) => {
+  if (e.target === plotterFileInput) return; // avoid re-triggering from the bubbled click
+  plotterFileInput.click();
+});
 plotterFileInput.addEventListener("change", () => {
   if (plotterFileInput.files.length) loadPlotterFile(plotterFileInput.files[0]);
 });
