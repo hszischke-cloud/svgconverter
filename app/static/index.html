@@ -13,9 +13,13 @@
       Turns each drawn line into a <strong>single centerline vector</strong> &mdash;
       not two outline vectors with a fill.
     </p>
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="convert" role="tab">Image &rarr; SVG</button>
+      <button class="tab" data-tab="plotter" role="tab">Pen Plotter Reorder</button>
+    </nav>
   </header>
 
-  <main>
+  <main id="tab-convert" class="tab-panel active">
     <section class="panel controls">
       <div id="dropzone" class="dropzone">
         <input type="file" id="fileInput" accept="image/*" hidden />
@@ -93,6 +97,64 @@
       <div class="preview-box">
         <h2>Centerline SVG</h2>
         <div id="svgView" class="view"></div>
+      </div>
+    </section>
+  </main>
+
+  <main id="tab-plotter" class="tab-panel">
+    <section class="panel controls">
+      <p class="panel-intro">
+        Upload an SVG and get it back with the vectors <strong>reordered for a
+        pen plotter</strong>: the pen always heads to the nearest next stroke
+        (and can enter from whichever end is closer), so it wastes far less time
+        travelling with the pen up. The drawn shapes are unchanged &mdash; only
+        their draw order and direction.
+      </p>
+
+      <div id="plotterDropzone" class="dropzone">
+        <input type="file" id="plotterFileInput" accept=".svg,image/svg+xml" hidden />
+        <p>Drop an SVG here<br /><span>or click to browse</span></p>
+      </div>
+
+      <fieldset>
+        <legend>Reorder options</legend>
+
+        <label class="row checkbox">
+          <input type="checkbox" id="allowReverse" checked />
+          <span>Allow reversing strokes (enter at the closer end)</span>
+        </label>
+
+        <label class="row checkbox">
+          <input type="checkbox" id="groupByColor" checked />
+          <span>Group by stroke color (minimize pen swaps)</span>
+        </label>
+
+        <label class="row checkbox">
+          <input type="checkbox" id="twoOpt" checked />
+          <span>2-opt refinement (untangle crossings, slower)</span>
+        </label>
+      </fieldset>
+
+      <button id="optimizeBtn" disabled>Reorder for plotter</button>
+      <button id="plotterDownloadBtn" disabled>Download SVG</button>
+      <p id="plotterStatus" class="status"></p>
+
+      <dl id="travelStats" class="stats" hidden>
+        <div><dt>Strokes</dt><dd id="statStrokes">&ndash;</dd></div>
+        <div><dt>Travel before</dt><dd id="statBefore">&ndash;</dd></div>
+        <div><dt>Travel after</dt><dd id="statAfter">&ndash;</dd></div>
+        <div><dt>Saved</dt><dd id="statSaved">&ndash;</dd></div>
+      </dl>
+    </section>
+
+    <section class="panel preview">
+      <div class="preview-box">
+        <h2>Original order</h2>
+        <div id="plotterOriginalView" class="view"></div>
+      </div>
+      <div class="preview-box">
+        <h2>Reordered for plotter</h2>
+        <div id="plotterSvgView" class="view"></div>
       </div>
     </section>
   </main>

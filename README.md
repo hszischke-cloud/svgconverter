@@ -48,6 +48,29 @@ The tracing engine (`app/tracing/`) runs this pipeline:
 9. **Emit** — each path is written as `<path fill="none" stroke=... />`
    (`svg.py`).
 
+## Pen-plotter reorder
+
+A second tab, **Pen Plotter Reorder**, takes an SVG you already have and
+reorders its vectors so a pen plotter wastes less time travelling with the pen
+up. It splits the SVG into independent strokes (each `M`-started subpath, plus
+`line`/`polyline`/`polygon`/`rect`/`circle`/`ellipse` elements) and reorders
+them with a greedy **nearest-neighbour** rule — the pen always heads to the
+closest next stroke. Open strokes can be **reversed** so the pen enters at
+whichever end is nearer, and an optional bounded **2-opt** pass untangles
+obvious crossings. The drawn geometry is preserved exactly; only the draw order
+and direction change (`app/plotter.py`).
+
+| Option            | What it does                                                       |
+|-------------------|-------------------------------------------------------------------|
+| Allow reversing   | Let an open stroke be drawn from either end (enter at the closer). |
+| Group by color    | Keep same-colored strokes together to minimize multi-pen swaps.    |
+| 2-opt refinement  | Extra pass that reverses stroke blocks to shorten total travel.    |
+
+The UI reports stroke count and pen-up travel before vs. after, so you can see
+how much movement was saved. API: `POST /api/optimize` (multipart, field
+`file`) returns `{ svg, width, height, path_count, original_travel,
+optimized_travel, stats }`.
+
 ## Running it
 
 ```bash
@@ -82,6 +105,7 @@ Returns JSON: `{ svg, width, height, path_count, stroke_width, stats }`.
 ```
 app/
   main.py            FastAPI app + routes
+  plotter.py         pen-plotter vector reordering (parse, reverse, optimize)
   tracing/
     pipeline.py      orchestrates the full trace
     skeleton.py      skeleton → polylines (graph walk)

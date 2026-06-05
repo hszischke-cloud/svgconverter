@@ -10,6 +10,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from PIL import Image, UnidentifiedImageError
 
+from .plotter import optimize_svg
 from .tracing import TraceParams, trace
 
 app = FastAPI(title="Centerline SVG Converter")
@@ -82,6 +83,49 @@ async def convert(
             "height": result.height,
             "path_count": result.path_count,
             "stroke_width": result.stroke_width,
+            "stats": result.stats,
+        }
+    )
+
+
+@app.post("/api/optimize")
+async def optimize(
+    file: UploadFile = File(...),
+    allow_reverse: bool = Form(True),
+    group_by_color: bool = Form(True),
+    two_opt: bool = Form(True),
+):
+    raw = await file.read()
+    if not raw:
+        raise HTTPException(status_code=400, detail="Empty file.")
+    if len(raw) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="File too large (max 25 MB).")
+
+    try:
+        svg_text = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        raise HTTPException(status_code=400, detail="File is not a text/SVG file.")
+
+    try:
+        result = optimize_svg(
+            svg_text,
+            allow_reverse=allow_reverse,
+            group_by_color=group_by_color,
+            two_opt=two_opt,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:  # pragma: no cover - surface engine errors cleanly
+        raise HTTPException(status_code=500, detail=f"Reordering failed: {exc}")
+
+    return JSONResponse(
+        {
+            "svg": result.svg,
+            "width": result.width,
+            "height": result.height,
+            "path_count": result.path_count,
+            "original_travel": round(result.original_travel, 2),
+            "optimized_travel": round(result.optimized_travel, 2),
             "stats": result.stats,
         }
     )
